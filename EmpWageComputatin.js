@@ -22,23 +22,48 @@ const checkAttendance = () => {
 const fullDayHour = 8;
 const wagePerHour = 20;
 const partTimeHour=4;
-const dailyWageCalculation=(attendance,type)=>{
-    return new Promise((resolve,reject)=>{
-        if(attendance==='Present'){
-            const workHour=type ? fullDayHour : partTimeHour;
-           const dailyWage=workHour*wagePerHour;
-        resolve(dailyWage)
+const dailyWageCalculation = (attendance, type) => {
+    return new Promise((resolve, reject) => {
+        if (attendance === 'Present') {
+            let workHour = 0;
+            // Use switch case for determining work hours
+            switch (type) {
+                case 'fullTime':
+                    workHour = fullDayHour;
+                    break;
+                case 'partTime':
+                    workHour = partTimeHour;
+                    break;
+                default:
+                    reject('Invalid employee type');
+            }
+            const dailyWage = workHour * wagePerHour;
+            resolve(dailyWage);
+        } else {
+            reject('Employee is Absent, no wage');
         }
-        else{
-            reject(' Employee is Absent no wage')
-        }
-    })
+    });
 }
-const empType=()=>
-    { 
-        const type = Math.random() < 0.5 ? "fullTime" : "partTime"; 
-        console.log(`The Type of Employee: ${type}`);
-        return type ==='fullTime'}
+const empType = () => { 
+    const randomValue = Math.random();
+    let type;
+
+    // Using switch case to determine the employee type
+    switch (true) {
+        case randomValue < 0.5:
+            type = 'fullTime';
+            break;
+        case randomValue >= 0.5:
+            type = 'partTime';
+            break;
+        default:
+            type = 'unknown';
+    }
+
+    console.log(`The Type of Employee: ${type}`);
+    return type;  // returning the type as a string
+}
+
 // Execute the main function
 empWageComputationMain();
 
