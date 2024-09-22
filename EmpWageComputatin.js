@@ -1,10 +1,8 @@
 async function empWageComputationMain() {
     console.log('Welcome to the Employee Wage Computation');
     try {
-        let attendance = await checkAttendance();
-        let type= empType();
-        const calculateWage=await dailyWageCalculation(attendance,type);
-        console.log( `employee is present \n wage of the employee is Rs. ${calculateWage}`);
+        const totalWageForMonth = await calculateMonthlyWage();
+        console.log(`Total wage for the month is Rs. ${totalWageForMonth}`);
     } catch (error) {
         console.log(error);
     }
@@ -19,14 +17,16 @@ const checkAttendance = () => {
             reject('Absent');
     });
 };
+
 const fullDayHour = 8;
 const wagePerHour = 20;
-const partTimeHour=4;
+const partTimeHour = 4;
+
 const dailyWageCalculation = (attendance, type) => {
     return new Promise((resolve, reject) => {
         if (attendance === 'Present') {
             let workHour = 0;
-            // Use switch case for determining work hours
+            
             switch (type) {
                 case 'fullTime':
                     workHour = fullDayHour;
@@ -44,11 +44,12 @@ const dailyWageCalculation = (attendance, type) => {
         }
     });
 }
+
 const empType = () => { 
     const randomValue = Math.random();
     let type;
 
-    // Using switch case to determine the employee type
+    
     switch (true) {
         case randomValue < 0.5:
             type = 'fullTime';
@@ -61,10 +62,29 @@ const empType = () => {
     }
 
     console.log(`The Type of Employee: ${type}`);
-    return type;  // returning the type as a string
+    return type; 
 }
+
+
+const calculateMonthlyWage = async () => {
+    const workingDays = 20;
+    let totalWageForMonth = 0;
+
+    for (let day = 1; day <= workingDays; day++) {
+        try {
+            let attendance = await checkAttendance();  
+            let type = empType();                     
+            const dailyWage = await dailyWageCalculation(attendance, type); 
+            totalWageForMonth += dailyWage;           
+            // console.log(`Day ${day}: Employee is present \nWage for the day is Rs. ${dailyWage}`);
+        } catch (error) {
+            console.log(`Day ${day}: ${error}`);      
+        }
+    }
+
+    return totalWageForMonth;  
+}
+
 
 // Execute the main function
 empWageComputationMain();
-
-
