@@ -9,6 +9,7 @@ class Employee {
         this.totalWageForMonth = 0;
         this.totalHoursWorked = 0;
         this.totalDaysWorked = 0;
+        this.employeeType = Employee.empType(); 
     }
 
     static checkAttendance() {
@@ -24,7 +25,6 @@ class Employee {
     static empType() {
         const randomValue = Math.random();
         let type;
-    
         switch (true) {
             case randomValue < 0.5:
                 type = 'fullTime';
@@ -33,26 +33,16 @@ class Employee {
                 type = 'partTime';
                 break;
             default:
-                type = 'unknown';  
+                type = 'unknown';
         }
-    
         console.log(`The Type of Employee: ${type}`);
-        return type;}
+        return type;
+    }
 
-    dailyWageCalculation(attendance, type) {
+    dailyWageCalculation(attendance) {
         return new Promise((resolve, reject) => {
             if (attendance === 'Present') {
-                let workHour = 0;
-                switch (type) {
-                    case 'fullTime':
-                        workHour = Employee.fullDayHour;
-                        break;
-                    case 'partTime':
-                        workHour = Employee.partTimeHour;
-                        break;
-                    default:
-                        reject('Invalid employee type');
-                }
+                let workHour = this.employeeType === 'fullTime' ? Employee.fullDayHour : Employee.partTimeHour;
                 const dailyWage = workHour * Employee.wagePerHour;
                 resolve({ dailyWage, workHour });
             } else {
@@ -64,9 +54,8 @@ class Employee {
     async calculateMonthlyWage() {
         while (this.totalDaysWorked < Employee.maxWorkingDays && this.totalHoursWorked < Employee.maxWorkingHours) {
             try {
-                const attendance = await Employee.checkAttendance();
-                const type = Employee.empType();
-                const { dailyWage, workHour } = await this.dailyWageCalculation(attendance, type);
+                let attendance = await Employee.checkAttendance();
+                const { dailyWage, workHour } = await this.dailyWageCalculation(attendance);
 
                 this.totalWageForMonth += dailyWage;
                 this.totalHoursWorked += workHour;
@@ -75,7 +64,7 @@ class Employee {
                 console.log(`Day ${this.totalDaysWorked}: Wage for the day is Rs. ${dailyWage}, Total hours worked: ${this.totalHoursWorked}`);
             } catch (error) {
                 console.log(`Day ${this.totalDaysWorked + 1}: ${error}`);
-                this.totalDaysWorked += 1; 
+                this.totalDaysWorked += 1;
             }
 
             if (this.totalHoursWorked >= Employee.maxWorkingHours) {
@@ -90,7 +79,7 @@ class Employee {
 
 async function empWageComputationMain() {
     console.log('Welcome to the Employee Wage Computation');
-    const employee = new Employee(); // Create an instance of Employee
+    const employee = new Employee();
     try {
         const totalWageForMonth = await employee.calculateMonthlyWage();
         console.log(`Total wage for the month is Rs. ${totalWageForMonth}`);
@@ -100,5 +89,3 @@ async function empWageComputationMain() {
 }
 
 empWageComputationMain();
-
-
